@@ -71,7 +71,9 @@
     | `t2.medium`  | Compression Rating: **9933 MIPS**(avg); Decompression Rating: **5858 MIPS**(avg) | **19485.77 MB/s**(avg) |
     | `c5d.large` | Compression Rating: **7741 MIPS**(avg); Decompression Rating: **5165 MIPS**(avg) | **13598.95 MB/s**(avg) |
 
-    > Region: US East (N. Virginia). Use `Ubuntu Server 22.04 LTS (HVM)` as AMI.
+    - The `t2.medium` shows significantly higher CPU performance compared to the `t2.micro` and `c5d.large`. This is expected because the `t2.medium` has more vCPUs (2 vCPUs) compared to the `t2.micro` (1 vCPU) and `c5d.large` (2 vCPUs). However, the `c5d.large` has a lower CPU performance than the `t2.medium`, despite having the same number of vCPUs. This could be due to differences in CPU architecture or the burstable nature of the `t2` instances.
+    - The `t2.medium` again shows the highest memory performance, followed by the `c5d.large` and then the `t2.micro`. This aligns with the increase in memory resources: `t2.medium` has 4 GiB of memory, `c5d.large` has 4 GiB, and `t2.micro` has 1 GiB. However, the `c5d.large` has lower memory performance than the `t2.medium`, which is unexpected given that both have the same amount of memory. This could be due to differences in memory bandwidth or other architectural factors.
+    - Therefore, the performance of EC2 instances **does not always increase commensurate with the increase in the number of vCPUs and memory resources**. While the `t2.medium` shows the highest performance in both CPU and memory benchmarks, the `c5d.large` underperforms relative to its resources. This suggests that factors such as CPU architecture, burstable performance (in the case of `t2` instances), and memory bandwidth also play a significant role in determining overall performance.
 
 ## Question 2: Measure the EC2 Network performance
 
@@ -79,12 +81,12 @@
 
     | Type                      | TCP b/w (Mbps) | RTT (ms) |
     | ------------------------- | -------------- | -------- |
-    | `t3.medium` - `t3.medium` |                |          |
-    | `m5.large` - `m5.large`   |                |          |
-    | `c5n.large` - `c5n.large` |                |          |
-    | `t3.medium` - `c5n.large` |                |          |
-    | `m5.large` - `c5n.large`  |                |          |
-    | `m5.large` - `t3.medium`  |                |          |
+    | `t3.medium` - `t3.medium` | 3380           | 0.305    |
+    | `m5.large` - `m5.large`   | 4950           | 0.133    |
+    | `c5n.large` - `c5n.large` | 4960           | 0.188    |
+    | `t3.medium` - `c5n.large` | 2400           | 0.683    |
+    | `m5.large` - `c5n.large`  | 2580           | 0.653    |
+    | `m5.large` - `t3.medium`  | 4310           | 0.295    |
 
     > Region: US East (N. Virginia). Use `Ubuntu Server 22.04 LTS (HVM)` as AMI. Note: Use private IP address when using iPerf within the same region. You'll need iPerf for measuring TCP bandwidth and Ping for measuring Round-Trip time.
 
@@ -92,8 +94,8 @@
 
     | Connection                | TCP b/w (Mbps) | RTT (ms) |
     | ------------------------- | -------------- | -------- |
-    | N. Virginia - Oregon      |                |          |
-    | N. Virginia - N. Virginia |                |          |
-    | Oregon - Oregon           |                |          |
+    | N. Virginia - Oregon      | 31.5           | 63.669   |
+    | N. Virginia - N. Virginia | 4950           | 0.217    |
+    | Oregon - Oregon           | 4960           | 0.143    |
 
     > Region: US East (N. Virginia), US West (Oregon). Use `Ubuntu Server 22.04 LTS (HVM)` as AMI. All instances are `c5.large`. Note: Use public IP address when using iPerf within the same region.
